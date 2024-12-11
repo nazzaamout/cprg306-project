@@ -1,25 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getItems } from "@/app/_services/bookfoo-service";
 import { useUserAuth } from "@/app/_utils/auth-context";
 import Link from "next/link";
+import Image from "next/image";
 import FavoriteButton from "./favorite-button";
 
-/**
- * MyFavorite component that displays the user's favorite books.
- */
 export default function MyFavorite() {
-  // State variables
   const [items, setItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const { user } = useUserAuth();
 
-  /**
-   * Loads the user's favorite books from the backend.
-   */
-  const loadItems = async () => {
+  const loadItems = useCallback(async () => {
     if (!user) {
       setError("Please login to view your favorites");
       setIsLoading(false);
@@ -35,26 +29,18 @@ export default function MyFavorite() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user]);
 
-  /**
-   * Loads the user's favorite books when the component mounts and the user is logged in.
-   */
   useEffect(() => {
     if (user) {
       loadItems();
     }
-  }, [user]);
+  }, [user, loadItems]);
 
-  /**
-   * Handles the favorite change event and reloads the favorites after a short delay.
-   */
   const handleFavoriteChange = async () => {
-    // Delay for a short time to ensure the backend operation is complete
     setTimeout(loadItems, 100);
   };
 
-  // Render the appropriate content based on the state
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -75,7 +61,7 @@ export default function MyFavorite() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
         <p className="text-gray-500">
-          You haven't added any books to your favorites yet.
+          You haven&apos;t added any books to your favorites yet.
         </p>
         <Link
           href="/bookfoo"
@@ -97,9 +83,11 @@ export default function MyFavorite() {
             className="flex gap-4 bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
           >
             {book.cover_i ? (
-              <img
+              <Image
                 src={`https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`}
                 alt={`Cover of ${book.title}`}
+                width={96}
+                height={144}
                 className="w-24 h-36 object-cover rounded"
               />
             ) : (

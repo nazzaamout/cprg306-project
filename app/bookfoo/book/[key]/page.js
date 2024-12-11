@@ -3,6 +3,7 @@
 import { Star, StarOff, Loader2 } from "lucide-react";
 import { useState, useEffect, use } from "react";
 import { useUserAuth } from "@/app/_utils/auth-context";
+import Image from "next/image";
 import {
   addItem,
   deleteItem,
@@ -10,18 +11,12 @@ import {
 } from "@/app/_services/bookfoo-service";
 
 export default function BookIntro({ params }) {
-  // Get the current user from the authentication context
   const { user } = useUserAuth();
-
-  // Get the book key from the URL parameters
   const bookKey = use(params).key;
-
-  // State variables to manage book data, loading state, and favorite status
   const [bookData, setBookData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [favoriteId, setFavoriteId] = useState(null);
 
-  // Fetch the book data from the Open Library API when the component mounts
   useEffect(() => {
     fetch(`https://openlibrary.org/works/${bookKey}.json`)
       .then((response) => response.json())
@@ -29,7 +24,6 @@ export default function BookIntro({ params }) {
       .catch((error) => console.error("Error fetching book:", error));
   }, [bookKey]);
 
-  // Check the favorite status of the book when the user or book key changes
   useEffect(() => {
     if (!user?.uid) return;
 
@@ -53,7 +47,6 @@ export default function BookIntro({ params }) {
     };
   }, [user?.uid, bookKey]);
 
-  // Handle toggling the favorite status of the book
   const handleToggleFavorite = async () => {
     if (!user?.uid || !bookData || isLoading) return;
 
@@ -79,7 +72,6 @@ export default function BookIntro({ params }) {
     setIsLoading(false);
   };
 
-  // Render the book introduction if the data is available, otherwise show a loading message
   if (!bookData) {
     return (
       <p className="text-gray-500 text-center mt-10">Loading book details...</p>
@@ -89,9 +81,11 @@ export default function BookIntro({ params }) {
   return (
     <div className="flex flex-col md:flex-row gap-6 mt-10 p-5">
       <div className="flex-shrink-0 relative">
-        <img
+        <Image
           src={`https://covers.openlibrary.org/b/id/${bookData.covers?.[0]}-L.jpg`}
           alt={`Cover of ${bookData.title}`}
+          width={400}
+          height={600}
           className="w-full max-w-sm h-auto rounded shadow-md"
         />
         <button

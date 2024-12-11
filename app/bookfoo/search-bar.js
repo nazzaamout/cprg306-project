@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Search,
   Loader2,
@@ -17,11 +18,7 @@ import {
   getFavoriteId,
 } from "@/app/_services/bookfoo-service";
 
-/**
- * SearchBar component that allows users to search for books and manage their favorites.
- */
 export default function SearchBar() {
-  // State variables
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -32,10 +29,6 @@ export default function SearchBar() {
   const itemsPerPage = 10;
   const { user } = useUserAuth();
 
-  /**
-   * Handles the search form submission and fetches book search results from the Open Library API.
-   * @param {React.FormEvent<HTMLFormElement>} [e] - The form submit event.
-   */
   const handleSearch = async (e) => {
     if (e?.preventDefault) {
       e.preventDefault();
@@ -64,10 +57,6 @@ export default function SearchBar() {
     }
   };
 
-  /**
-   * Handles the toggling of a book's favorite status.
-   * @param {Object} book - The book object.
-   */
   const handleToggleFavorite = async (book) => {
     if (!user) {
       setError("Please sign in to manage favorites");
@@ -100,11 +89,6 @@ export default function SearchBar() {
     }
   };
 
-  /**
-   * Renders a button to toggle the favorite status of a book.
-   * @param {Object} book - The book object.
-   * @returns {React.ReactElement} - The FavoriteButton component.
-   */
   const FavoriteButton = ({ book }) => {
     const [isFavorite, setIsFavorite] = useState(false);
     const [checkingStatus, setCheckingStatus] = useState(true);
@@ -137,7 +121,7 @@ export default function SearchBar() {
       return () => {
         mounted = false;
       };
-    }, [user, book.key]);
+    }, [book.key]);
 
     const isLoading = checkingStatus || savingId === bookId;
 
@@ -158,20 +142,12 @@ export default function SearchBar() {
     );
   };
 
-  /**
-   * Retrieves the current page's search results.
-   * @returns {Object[]} - The current page's search results.
-   */
   const getCurrentPageResults = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     return results.slice(startIndex, endIndex);
   };
 
-  /**
-   * Handles the page change event and scrolls to the top of the page.
-   * @param {number} page - The new page number.
-   */
   const handlePageChange = (page) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -228,9 +204,11 @@ export default function SearchBar() {
                 <div className="flex gap-6">
                   {book.cover_i && (
                     <div className="flex-shrink-0">
-                      <img
+                      <Image
                         src={`https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`}
                         alt={`Cover of ${book.title}`}
+                        width={112}
+                        height={160}
                         className="w-28 h-40 object-cover rounded-lg shadow-sm"
                       />
                     </div>
